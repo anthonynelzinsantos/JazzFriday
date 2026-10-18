@@ -21,14 +21,15 @@ UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/129.0 Safari/537.36")
 
 
-def fetch(url, tries=5, pause=3):
+def fetch(url, tries=5, pause=3, binary=False):
     last = None
     for attempt in range(tries):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": UA,
                                                        "Accept-Language": "fr-FR,fr;q=0.9"})
             with urllib.request.urlopen(req, timeout=30) as r:
-                return r.read().decode("utf-8", "replace")
+                data = r.read()
+            return data if binary else data.decode("utf-8", "replace")
         except Exception as e:  # Network hiccups, 5xx
             last = e
             time.sleep(pause * (attempt + 1))
@@ -160,10 +161,55 @@ def atomic_write(path, data):
     d = os.path.dirname(os.path.abspath(path))
     os.makedirs(d, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=d, prefix=".tmp-")
-    with os.fdopen(fd, "w", encoding="utf-8") as f:
-        f.write(data)
+    with os.fdopen(fd, "wb") as f:
+        f.write(data if isinstance(data, bytes) else data.encode("utf-8"))
     os.chmod(tmp, 0o644)
     os.replace(tmp, path)
+
+
+# --------------------------------------------------------------- Covers
+
+COVER_WIDTHS = (300, 600)   # Qobuz resizes covers to fixed widths (JPEG quality ~80)
+
+
+def cover_name(a, width):
+    return f'{a["id"]}_{width}.jpg'
+
+
+def cache_covers(albums, cover_dir):
+    """Keep a local copy of every cover, so the site does not hotlink Qobuz’s CDN."""
+    os.makedirs(cover_dir, exist_ok=True)
+    for a in albums:
+        if not re.search(r"_\d+\.jpg$", a.get("cover") or ""):
+            continue
+        for width in COVER_WIDTHS:
+            path = os.path.join(cover_dir, cover_name(a, width))
+            if os.path.exists(path):
+                continue
+            src = re.sub(r"_\d+(\.jpg)$", rf"_{width}\1", a["cover"])
+            try:
+                data = fetch(src, tries=2, pause=1, binary=True)
+            except RuntimeError as e:
+                print(f"warn: {e}", file=sys.stderr)
+                continue
+            if data.startswith(b"\xff\xd8"):  # JPEG signature, not an HTML error page
+                atomic_write(path, data)
+            else:
+                print(f"warn: {src} is not a JPEG", file=sys.stderr)
+
+
+def stage_covers(albums, cover_dir, out_dir):
+    """Copy cached covers into the site; returns the ids that have every width."""
+    staged = set()
+    for a in albums:
+        paths = [os.path.join(cover_dir, cover_name(a, w)) for w in COVER_WIDTHS]
+        if not all(os.path.exists(p) for p in paths):
+            continue
+        for p in paths:
+            with open(p, "rb") as f:
+                atomic_write(os.path.join(out_dir, "covers", os.path.basename(p)), f.read())
+        staged.add(a["id"])
+    return staged
 
 
 # ---------------------------------------------------------------- Pages
@@ -192,6 +238,7 @@ CSS = """
   --colour-glass: hsl(275 5% 30%);
   --shadow-glass: hsl(275 15% 25% / 50%);
   --apple-music: #e5213a;
+  --apple-music-hover: #c91a31;
   --spotify: #1ed760;
   --deezer: #a238ff;
   --qobuz: #000;
@@ -265,12 +312,20 @@ h2 small { color: var(--colour-glass); font-size: 0.85rem; font-weight: 400; }
   padding: 6px var(--space-2xs);
   text-align: center;
   text-decoration: none;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
 .links a.am { background: var(--apple-music); border-color: var(--apple-music); color: #fff; font-weight: 600; }
 .links a.sp { border-color: var(--spotify); }
 .links a.dz { border-color: var(--deezer); }
 .links a.qb { border-color: var(--qobuz); }
 .links a.bc { border-style: dashed; }
+@media (hover: hover) {
+  .links a.am:hover { background: var(--apple-music-hover); border-color: var(--apple-music-hover); }
+  .links a.sp:hover { background: var(--spotify); color: #000; }
+  .links a.dz:hover { background: var(--deezer); color: #fff; }
+  .links a.qb:hover { background: var(--qobuz); color: var(--background-body); }
+  .links a.bc:hover { border-color: var(--colour-body); }
+}
 .weeks { list-style: none; margin: var(--space-s) 0 0; padding: 0; }
 .weeks li { border-bottom: 1px solid var(--border-article); display: flex; justify-content: space-between; padding: var(--space-2xs) 0; }
 .weeks a { text-decoration: none; }
@@ -285,8 +340,16 @@ h2 small { color: var(--colour-glass); font-size: 0.85rem; font-weight: 400; }
 """
 
 
-def card(a):
-    cover = a.get("cover") or ""
+def cover_img(a, root, staged):
+    if a["id"] not in staged:  # Not cached yet: hotlink Qobuz
+        return f'<img loading="lazy" src="{html.escape(a.get("cover") or "")}" alt="">'
+    srcset = ", ".join(f"{root}covers/{cover_name(a, w)} {w}w" for w in COVER_WIDTHS)
+    # Cards are at most ~260px wide, so the browser takes 300w, or 600w on dense screens
+    return (f'<img loading="lazy" src="{root}covers/{cover_name(a, COVER_WIDTHS[0])}" '
+            f'srcset="{srcset}" sizes="260px" alt="">')
+
+
+def card(a, root, staged):
     meta = " · ".join(x for x in [a.get("label"), a.get("genre"),
                                   "Hi-Res" if a.get("hires") else None] if x)
     q = urllib.parse.quote(re.sub(r"[\s/]+", " ", f'{a["artist"]} {a["title"]}'))
@@ -299,7 +362,7 @@ def card(a):
     dz = f'<a class="dz" href="https://www.deezer.com/search/{q}/album">Deezer</a>'
     qb = f'<a class="qb" href="{html.escape(a["qobuz"])}">Qobuz</a>'
     return (f'<article class="card">'
-            f'<img loading="lazy" src="{html.escape(cover)}" alt="">'
+            f'{cover_img(a, root, staged)}'
             f'<div class="body"><span class="artist">{html.escape(a["artist"])}</span>'
             f'<span class="title">{html.escape(a["title"])}</span>'
             f'<span class="meta">{html.escape(meta)}</span>'
@@ -307,8 +370,9 @@ def card(a):
             f'</div></article>')
 
 
-def grid(items, key):
-    return f'<div class="grid">{"".join(card(a) for a in sorted(items, key=key))}</div>'
+def grid(items, key, root, staged):
+    return (f'<div class="grid">'
+            f'{"".join(card(a, root, staged) for a in sorted(items, key=key))}</div>')
 
 
 def albums(n):
@@ -337,7 +401,8 @@ def page(title, root, body, nav=""):
 """
 
 
-def build_site(state, today, out_dir):
+def build_site(state, today, out_dir, cover_dir):
+    staged = stage_covers(state["albums"].values(), cover_dir, out_dir)
     weeks, upcoming = {}, []
     for a in state["albums"].values():
         if (a.get("released") or "") > today.isoformat():
@@ -348,18 +413,20 @@ def build_site(state, today, out_dir):
     fridays = sorted(weeks, reverse=True)
     files = {}
 
-    def week_section(w):
+    def week_section(w, root):
         return (f'<section id="w{w.isoformat()}"><h2>Friday {fmt_day(w)}'
-                f'<small>{albums(len(weeks[w]))}</small></h2>{grid(weeks[w], by_artist)}</section>')
+                f'<small>{albums(len(weeks[w]))}</small></h2>'
+                f'{grid(weeks[w], by_artist, root, staged)}</section>')
 
     # Front page: upcoming releases and the latest weeks.
     body, nav = [], []
     if upcoming:
         body.append(f'<section id="upcoming"><h2>Coming up<small>{albums(len(upcoming))}</small></h2>'
-                    f'{grid(upcoming, lambda a: (a.get("released") or "", by_artist(a)))}</section>')
+                    f'{grid(upcoming, lambda a: (a.get("released") or "", by_artist(a)), "", staged)}'
+                    f'</section>')
         nav.append('<a href="#upcoming">Coming up</a>')
     for w in fridays[:WEEKS_ON_HOME]:
-        body.append(week_section(w))
+        body.append(week_section(w, ""))
         nav.append(f'<a href="#w{w.isoformat()}">{fmt_day(w)}</a>')
     nav.append('<a href="archive/index.html">Archive</a>')
     files["index.html"] = page("Jazz Friday", "", "".join(body) or '<p class="empty">Nothing yet.</p>',
@@ -374,7 +441,7 @@ def build_site(state, today, out_dir):
         pager += f'<a href="{newer.isoformat()}.html">{fmt_day(newer)} →</a>' if newer else "<span></span>"
         pager += "</div>"
         files[f"archive/{w.isoformat()}.html"] = page(
-            f"Jazz Friday · {fmt_day(w)}", "../", week_section(w) + pager,
+            f"Jazz Friday · {fmt_day(w)}", "../", week_section(w, "../") + pager,
             '<a href="../index.html">Latest</a><a href="index.html">Archive</a>')
 
     # Archive index.
@@ -418,7 +485,9 @@ def main():
         time.sleep(3)  # Stay well under Apple’s search rate limit
 
     atomic_write(args.state, json.dumps(state, ensure_ascii=False, indent=1))
-    weeks = build_site(state, today, args.out_dir)
+    cover_dir = os.path.join(os.path.dirname(os.path.abspath(args.state)), "covers")
+    cache_covers(known.values(), cover_dir)
+    weeks = build_site(state, today, args.out_dir, cover_dir)
     print(f"{new} new album(s); {len(known)} albums across {weeks} weeks")
 
 
