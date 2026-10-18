@@ -191,6 +191,10 @@ CSS = """
   --colour-body: hsl(275 15% 15%);
   --colour-glass: hsl(275 5% 30%);
   --shadow-glass: hsl(275 15% 25% / 50%);
+  --apple-music: #e5213a;
+  --spotify: #1ed760;
+  --deezer: #a238ff;
+  --qobuz: #000;
   --space-3xs: clamp(0.25rem, 0.2188rem + 0.1563vw, 0.3125rem);
   --space-2xs: clamp(0.5rem, 0.4688rem + 0.1563vw, 0.5625rem);
   --space-xs: clamp(0.75rem, 0.6875rem + 0.3125vw, 0.875rem);
@@ -209,6 +213,7 @@ CSS = """
     --colour-body: hsl(275 5% 80%);
     --colour-glass: hsl(275 5% 90%);
     --shadow-glass: hsl(275 15% 15% / 50%);
+    --qobuz: #fff;
   }
 }
 * { box-sizing: border-box; }
@@ -252,15 +257,19 @@ h2 small { color: var(--colour-glass); font-size: 0.85rem; font-weight: 400; }
 .artist { font-weight: 600; }
 .title { font-style: italic; }
 .meta { color: var(--colour-glass); font-size: 0.8rem; }
-.links { display: flex; flex-wrap: wrap; gap: var(--space-3xs); margin-top: auto; padding-top: var(--space-2xs); }
+.links { display: flex; flex-direction: column; gap: var(--space-3xs); margin-top: auto; padding-top: var(--space-2xs); }
 .links a {
   border: 1px solid var(--border-article);
   border-radius: 6px;
   font-size: 0.8rem;
-  padding: 4px var(--space-2xs);
+  padding: 6px var(--space-2xs);
+  text-align: center;
   text-decoration: none;
 }
-.links a.am { background: var(--colour-body); border-color: var(--colour-body); color: var(--background-body); }
+.links a.am { background: var(--apple-music); border-color: var(--apple-music); color: #fff; font-weight: 600; }
+.links a.sp { border-color: var(--spotify); }
+.links a.dz { border-color: var(--deezer); }
+.links a.qb { border-color: var(--qobuz); }
 .links a.bc { border-style: dashed; }
 .weeks { list-style: none; margin: var(--space-s) 0 0; padding: 0; }
 .weeks li { border-bottom: 1px solid var(--border-article); display: flex; justify-content: space-between; padding: var(--space-2xs) 0; }
@@ -271,7 +280,7 @@ h2 small { color: var(--colour-glass); font-size: 0.85rem; font-weight: 400; }
 @media (max-width: 520px) {
   .body { padding: var(--space-2xs); }
   .grid { gap: var(--space-2xs); grid-template-columns: 1fr 1fr; }
-  .links a { padding: 3px 6px; }
+  .links a { padding: 5px 6px; }
 }
 """
 
@@ -280,18 +289,21 @@ def card(a):
     cover = a.get("cover") or ""
     meta = " · ".join(x for x in [a.get("label"), a.get("genre"),
                                   "Hi-Res" if a.get("hires") else None] if x)
+    q = urllib.parse.quote(re.sub(r"[\s/]+", " ", f'{a["artist"]} {a["title"]}'))
     if a.get("apple"):
         am = f'<a class="am" href="{html.escape(a["apple"])}">Apple Music</a>'
     else:
-        q = urllib.parse.quote(f'{a["artist"]} {a["title"]}')
         am = (f'<a class="bc" href="https://bandcamp.com/search?q={q}&amp;item_type=a">'
               f'Not on Apple Music · Bandcamp</a>')
+    sp = f'<a class="sp" href="https://open.spotify.com/search/{q}">Spotify</a>'
+    dz = f'<a class="dz" href="https://www.deezer.com/search/{q}/album">Deezer</a>'
+    qb = f'<a class="qb" href="{html.escape(a["qobuz"])}">Qobuz</a>'
     return (f'<article class="card">'
             f'<img loading="lazy" src="{html.escape(cover)}" alt="">'
             f'<div class="body"><span class="artist">{html.escape(a["artist"])}</span>'
             f'<span class="title">{html.escape(a["title"])}</span>'
             f'<span class="meta">{html.escape(meta)}</span>'
-            f'<div class="links">{am}<a href="{html.escape(a["qobuz"])}">Qobuz</a></div>'
+            f'<div class="links">{am}{sp}{dz}{qb}</div>'
             f'</div></article>')
 
 
