@@ -10,6 +10,7 @@ import sys
 import tempfile
 import time
 import unicodedata
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -19,6 +20,15 @@ APPLE_COUNTRY = "fr"        # Apple Music storefront
 WEEKS_ON_HOME = 4           # Weeks on front page
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/129.0 Safari/537.36")
+
+
+def describe(e):
+    """Error text plus the response headers that tell a rate limit from a firewall."""
+    if not isinstance(e, urllib.error.HTTPError):
+        return str(e)
+    hints = [f"{h}={e.headers[h]}" for h in ("server", "retry-after", "cf-mitigated")
+             if e.headers.get(h)]
+    return f"{e} [{' '.join(hints)} headers={','.join(sorted(k.lower() for k in e.headers))}]"
 
 
 def fetch(url, tries=5, pause=3, binary=False):
@@ -33,7 +43,7 @@ def fetch(url, tries=5, pause=3, binary=False):
         except Exception as e:  # Network hiccups, 5xx
             last = e
             time.sleep(pause * (attempt + 1))
-    raise RuntimeError(f"failed to fetch {url}: {last}")
+    raise RuntimeError(f"failed to fetch {url}: {describe(last)}")
 
 
 def text(s):

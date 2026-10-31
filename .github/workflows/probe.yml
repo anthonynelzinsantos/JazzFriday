@@ -1,0 +1,36 @@
+name: probe
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Probe Qobuz from this runner
+        run: |
+          echo "Runner network: $(curl -sS --max-time 10 https://ipinfo.io/org)"
+          python - <<'EOF'
+          import json, time
+          import jazz_friday as j
+
+          albums = list(json.load(open("state.json"))["albums"].values())
+          targets = [("listing", f"{j.QOBUZ}/{j.LOCALE}/shop/jazz/download-streaming-albums"),
+                     ("cover", albums[0]["cover"])]
+          targets += [(f"album page {i + 1}", a["qobuz"]) for i, a in enumerate(albums[:3])]
+          for label, url in targets:
+              try:
+                  size = len(j.fetch(url, tries=1, pause=0, binary=True))
+                  print(f"{label}: OK, {size} bytes")
+              except RuntimeError as e:
+                  print(f"{label}: {e}")
+              time.sleep(5)
+          EOF
