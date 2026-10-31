@@ -23,7 +23,6 @@ UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
 
 
 def describe(e):
-    """Error text plus the response headers that tell a rate limit from a firewall."""
     if not isinstance(e, urllib.error.HTTPError):
         return str(e)
     hints = [f"{h}={e.headers[h]}" for h in ("server", "retry-after", "cf-mitigated")
@@ -83,7 +82,7 @@ def qobuz_curated():
 
 
 def qobuz_details(album):
-    page = fetch(album["qobuz"], tries=2, pause=1)  # A refusal is not worth minutes of retries
+    page = fetch(album["qobuz"], tries=2, pause=1)
     out = {}
     for blob in re.findall(r'<script type="application/ld\+json">(.*?)</script>', page, re.S):
         try:
@@ -177,9 +176,7 @@ def atomic_write(path, data):
     os.replace(tmp, path)
 
 
-# --------------------------------------------------------------- Covers
-
-COVER_WIDTHS = (300, 600)   # Qobuz resizes covers to fixed widths (JPEG quality ~80)
+COVER_WIDTHS = (300, 600)
 
 
 def cover_name(a, width):
@@ -187,7 +184,6 @@ def cover_name(a, width):
 
 
 def cache_covers(albums, cover_dir):
-    """Keep a local copy of every cover, so the site does not hotlink Qobuz’s CDN."""
     os.makedirs(cover_dir, exist_ok=True)
     for a in albums:
         if not re.search(r"_\d+\.jpg$", a.get("cover") or ""):
@@ -202,14 +198,13 @@ def cache_covers(albums, cover_dir):
             except RuntimeError as e:
                 print(f"warn: {e}", file=sys.stderr)
                 continue
-            if data.startswith(b"\xff\xd8"):  # JPEG signature, not an HTML error page
+            if data.startswith(b"\xff\xd8"):
                 atomic_write(path, data)
             else:
                 print(f"warn: {src} is not a JPEG", file=sys.stderr)
 
 
 def stage_covers(albums, cover_dir, out_dir):
-    """Copy cached covers into the site; returns the ids that have every width."""
     staged = set()
     for a in albums:
         paths = [os.path.join(cover_dir, cover_name(a, w)) for w in COVER_WIDTHS]
@@ -351,10 +346,9 @@ h2 small { color: var(--colour-glass); font-size: 0.85rem; font-weight: 400; }
 
 
 def cover_img(a, root, staged):
-    if a["id"] not in staged:  # Not cached yet: hotlink Qobuz
+    if a["id"] not in staged:
         return f'<img loading="lazy" src="{html.escape(a.get("cover") or "")}" alt="">'
     srcset = ", ".join(f"{root}covers/{cover_name(a, w)} {w}w" for w in COVER_WIDTHS)
-    # Cards are at most ~260px wide, so the browser takes 300w, or 600w on dense screens
     return (f'<img loading="lazy" src="{root}covers/{cover_name(a, COVER_WIDTHS[0])}" '
             f'srcset="{srcset}" sizes="260px" alt="">')
 
@@ -412,14 +406,13 @@ def page(title, root, body, nav=""):
 
 
 def build_site(state, today, out_dir, cover_dir):
-    staged = stage_covers(state["albums"].values(), cover_dir, out_dir)
-    weeks, upcoming = {}, []
+    weeks = {}
     for a in state["albums"].values():
         if (a.get("released") or "") > today.isoformat():
-            upcoming.append(a)
             continue
         first = dt.date.fromisoformat(a["first_seen"])
         weeks.setdefault(week_friday(a.get("released"), first), []).append(a)
+    staged = stage_covers((a for w in weeks.values() for a in w), cover_dir, out_dir)
     fridays = sorted(weeks, reverse=True)
     files = {}
 
@@ -428,13 +421,8 @@ def build_site(state, today, out_dir, cover_dir):
                 f'<small>{albums(len(weeks[w]))}</small></h2>'
                 f'{grid(weeks[w], by_artist, root, staged)}</section>')
 
-    # Front page: upcoming releases and the latest weeks.
+    # Front page: the latest weeks.
     body, nav = [], []
-    if upcoming:
-        body.append(f'<section id="upcoming"><h2>Coming up<small>{albums(len(upcoming))}</small></h2>'
-                    f'{grid(upcoming, lambda a: (a.get("released") or "", by_artist(a)), "", staged)}'
-                    f'</section>')
-        nav.append('<a href="#upcoming">Coming up</a>')
     for w in fridays[:WEEKS_ON_HOME]:
         body.append(week_section(w, ""))
         nav.append(f'<a href="#w{w.isoformat()}">{fmt_day(w)}</a>')
@@ -484,7 +472,7 @@ def main():
             continue
         try:
             a.update(qobuz_details(a))
-        except Exception as e:  # No cover or date makes a useless card: retry on the next run
+        except Exception as e:
             print(f"warn: skipping {a['qobuz']}: {e}", file=sys.stderr)
             skipped += 1
             continue
