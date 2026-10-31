@@ -73,7 +73,7 @@ def qobuz_curated():
 
 
 def qobuz_details(album):
-    page = fetch(album["qobuz"])
+    page = fetch(album["qobuz"], tries=2, pause=1)  # A refusal is not worth minutes of retries
     out = {}
     for blob in re.findall(r'<script type="application/ld\+json">(.*?)</script>', page, re.S):
         try:
@@ -468,14 +468,16 @@ def main():
     state = load_state(args.state)
     known = state["albums"]
 
-    new = 0
+    new = skipped = 0
     for a in qobuz_curated():
         if a["id"] in known:
             continue
         try:
             a.update(qobuz_details(a))
-        except Exception as e:
-            print(f"warn: details for {a['qobuz']}: {e}", file=sys.stderr)
+        except Exception as e:  # No cover or date makes a useless card: retry on the next run
+            print(f"warn: skipping {a['qobuz']}: {e}", file=sys.stderr)
+            skipped += 1
+            continue
         a["apple"] = apple_lookup(a["artist"], a["title"], a.get("released"))
         if not a["apple"] and a.get("artists") and a["artists"] != a["artist"]:
             a["apple"] = apple_lookup(a["artists"], a["title"], a.get("released"))
@@ -489,6 +491,8 @@ def main():
     cache_covers(known.values(), cover_dir)
     weeks = build_site(state, today, args.out_dir, cover_dir)
     print(f"{new} new album(s); {len(known)} albums across {weeks} weeks")
+    if skipped:
+        print(f"::warning::{skipped} album(s) skipped, Qobuz details unavailable; will retry next run")
 
 
 if __name__ == "__main__":
