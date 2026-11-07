@@ -67,6 +67,7 @@ def qobuz_curated():
         m = re.search(r'href="(/[^"]*/album/[^"]+/([a-z0-9]+))"', li)
         t = re.search(r'class="album-title[^"]*"[^>]*>(.*?)</a>', li, re.S)
         a = re.search(r'class="artist-name[^"]*"[^>]*>(.*?)</a>', li, re.S)
+        c = re.search(r'<img[^>]*\bsrc="(https://static\.qobuz\.com/images/covers/[^"]+)_\d+\.jpg"', li)
         if not (m and t):
             continue
         albums.append({
@@ -75,6 +76,7 @@ def qobuz_curated():
             "title": text(t.group(1)),
             "artist": text(a.group(1)) if a else "",
             "hires": "smr-audio" in li,
+            "cover": f"{c.group(1)}_600.jpg" if c else "",
         })
     if not albums:
         raise RuntimeError("Qobuz page layout changed: no albums parsed")
@@ -151,9 +153,18 @@ def apple_lookup(artist, title, released=None):
             score += 0.05      # Prefer the album over a single of the same name
         if t_score >= 0.75 and a_score >= 0.6 and score > best_score:
             best, best_score = r, score
-    if not best:
-        return None
-    return best.get("collectionViewUrl", "").split("?")[0] or None
+    return best
+
+
+def apple_match(a, released):
+    hit = apple_lookup(a["artist"], a["title"], released)
+    if not hit and a.get("artists") and a["artists"] != a["artist"]:
+        hit = apple_lookup(a["artists"], a["title"], released)
+    return hit
+
+
+def apple_url(hit):
+    return (hit or {}).get("collectionViewUrl", "").split("?")[0] or None
 
 
 # --------------------------------------------------------------- State
@@ -411,6 +422,7 @@ def build_site(state, today, out_dir, cover_dir):
         if (a.get("released") or "") > today.isoformat():
             continue
         first = dt.date.fromisoformat(a["first_seen"])
+        first -= dt.timedelta(days=(first.weekday() - 4) % 7)
         weeks.setdefault(week_friday(a.get("released"), first), []).append(a)
     staged = stage_covers((a for w in weeks.values() for a in w), cover_dir, out_dir)
     fridays = sorted(weeks, reverse=True)
@@ -466,19 +478,43 @@ def main():
     state = load_state(args.state)
     known = state["albums"]
 
-    new = skipped = 0
-    for a in qobuz_curated():
-        if a["id"] in known:
+    blocked = False
+    upgraded = 0
+    for a in known.values():
+        if blocked or not a.get("partial"):
             continue
         try:
             a.update(qobuz_details(a))
         except Exception as e:
-            print(f"warn: skipping {a['qobuz']}: {e}", file=sys.stderr)
-            skipped += 1
+            print(f"warn: details for {a['qobuz']}: {e}", file=sys.stderr)
+            blocked = True
             continue
-        a["apple"] = apple_lookup(a["artist"], a["title"], a.get("released"))
-        if not a["apple"] and a.get("artists") and a["artists"] != a["artist"]:
-            a["apple"] = apple_lookup(a["artists"], a["title"], a.get("released"))
+        del a["partial"]
+        upgraded += 1
+        if not a.get("apple"):
+            a["apple"] = apple_url(apple_match(a, a.get("released")))
+            time.sleep(3)
+
+    new = partial = 0
+    for a in qobuz_curated():
+        if a["id"] in known:
+            continue
+        if not blocked:
+            try:
+                a.update(qobuz_details(a))
+            except Exception as e:
+                print(f"warn: details for {a['qobuz']}: {e}", file=sys.stderr)
+                blocked = True
+        if blocked:
+            a["partial"] = True
+            partial += 1
+        hit = apple_match(a, a.get("released") or today.isoformat())
+        a["apple"] = apple_url(hit)
+        if hit and a.get("partial"):
+            if hit.get("releaseDate"):
+                a["released"] = hit["releaseDate"][:10]
+            if hit.get("primaryGenreName"):
+                a["genre"] = hit["primaryGenreName"]
         a["first_seen"] = today.isoformat()
         known[a["id"]] = a
         new += 1
@@ -489,8 +525,10 @@ def main():
     cache_covers(known.values(), cover_dir)
     weeks = build_site(state, today, args.out_dir, cover_dir)
     print(f"{new} new album(s); {len(known)} albums across {weeks} weeks")
-    if skipped:
-        print(f"::warning::{skipped} album(s) skipped, Qobuz details unavailable; will retry next run")
+    if upgraded:
+        print(f"{upgraded} partial album(s) completed from Qobuz")
+    if partial:
+        print(f"::warning::{partial} album(s) added from the listing and Apple only: Qobuz refused their pages")
 
 
 if __name__ == "__main__":
