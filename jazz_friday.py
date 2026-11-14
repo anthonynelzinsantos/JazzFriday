@@ -17,8 +17,13 @@ import urllib.request
 QOBUZ = "https://www.qobuz.com"
 LOCALE = "fr-fr"            # Qobuz store locale
 APPLE_COUNTRY = "fr"        # Apple Music storefront
-MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août",
-          "septembre", "octobre", "novembre", "décembre"]
+STORES = ["fr-fr", "gb-en"]
+MONTHS = {
+    "fr-fr": ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août",
+              "septembre", "octobre", "novembre", "décembre"],
+    "gb-en": ["january", "february", "march", "april", "may", "june", "july", "august",
+              "september", "october", "november", "december"],
+}
 WEEKS_ON_HOME = 4           # Weeks on front page
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/129.0 Safari/537.36")
@@ -53,7 +58,8 @@ def text(s):
 
 # ---------------------------------------------------------------- Qobuz
 
-def qobuz_cards(page):
+def qobuz_cards(page, store=LOCALE):
+    months = MONTHS[store]
     albums = []
     for card in re.split(r'(?=<div\s+id="release-card-release-card-list-\d+-grid-\d+-[a-z0-9]+")', page)[1:]:
         t = re.search(r'<a[^>]*\btitle="[^"]*"[^>]*\bhref="(/[^"]*/album/[^"]+/([a-z0-9]+))"[^>]*>'
@@ -65,7 +71,7 @@ def qobuz_cards(page):
         c = re.search(r'<img[^>]*\bsrc="(https://static\.qobuz\.com/images/covers/[^"]+)_\d+\.jpg"', card)
         album = {
             "id": t.group(2),
-            "qobuz": QOBUZ + t.group(1),
+            "qobuz": QOBUZ + re.sub(r"^/[a-z]{2}-[a-z]{2}/", f"/{LOCALE}/", t.group(1)),
             "title": text(t.group(3)),
             "artist": text(a.group(1)) if a else "",
             "hires": bool(q and q.group(1).startswith("Hi-Res")),
@@ -73,10 +79,10 @@ def qobuz_cards(page):
         }
         spans = [text(s) for s in re.findall(r"<span[^>]*>\s*([^<]+?)\s*</span>", card)]
         for i, s in enumerate(spans):
-            d = re.search(r"(\d{1,2}) (" + "|".join(MONTHS) + r") (\d{4})", s)
+            d = re.search(r"(\d{1,2}) (" + "|".join(months) + r") (\d{4})", s, re.I)
             if d:
-                album["released"] = f"{d.group(3)}-{MONTHS.index(d.group(2)) + 1:02d}-{int(d.group(1)):02d}"
-                if i and spans[i - 1] not in ("Ajouter au panier", "Précommande"):
+                album["released"] = f"{d.group(3)}-{months.index(d.group(2).lower()) + 1:02d}-{int(d.group(1)):02d}"
+                if store == LOCALE and i and spans[i - 1] not in ("Ajouter au panier", "Précommande"):
                     album["genre"] = spans[i - 1]
                 break
         albums.append(album)
@@ -85,18 +91,26 @@ def qobuz_cards(page):
 
 def qobuz_curated():
     """Albums on the “Nouveautés Jazz” pages of the Qobuz shop."""
-    base = f"{QOBUZ}/{LOCALE}/shop/new-releases/jazz/download-streaming-albums"
     albums, seen = [], set()
-    for n in range(1, 11):
-        fresh = [a for a in qobuz_cards(fetch(base if n == 1 else f"{base}/page/{n}"))
-                 if a["id"] not in seen]
-        if not fresh:
-            break
-        seen.update(a["id"] for a in fresh)
-        albums += fresh
-        time.sleep(2)
-    if not albums:
-        raise RuntimeError("Qobuz page layout changed: no albums parsed")
+    for store in STORES:
+        base = f"{QOBUZ}/{store}/shop/new-releases/jazz/download-streaming-albums"
+        found = 0
+        try:
+            for n in range(1, 11):
+                fresh = [a for a in qobuz_cards(fetch(base if n == 1 else f"{base}/page/{n}"), store)
+                         if a["id"] not in seen]
+                if not fresh:
+                    break
+                seen.update(a["id"] for a in fresh)
+                albums += fresh
+                found += len(fresh)
+                time.sleep(2)
+        except RuntimeError as e:
+            if store == LOCALE:
+                raise
+            print(f"warn: {store}: {e}", file=sys.stderr)
+        if not found and store == LOCALE:
+            raise RuntimeError("Qobuz page layout changed: no albums parsed")
     return albums
 
 
@@ -415,6 +429,19 @@ def by_artist(a):
     return (a["artist"].lower(), a["title"].lower())
 
 
+def unique(albums):
+    seen, kept = set(), []
+    for a in sorted(albums, key=lambda a: (a["first_seen"], bool(a.get("partial")), a["id"])):
+        keys = {(norm(a["artist"]), norm(a["title"]))}
+        if a.get("apple"):
+            keys.add(a["apple"])
+        if keys & seen:
+            continue
+        seen |= keys
+        kept.append(a)
+    return kept
+
+
 def page(title, root, body, nav=""):
     updated = dt.datetime.now().strftime("%-d %B %Y, %H:%M")
     return f"""<!doctype html>
@@ -435,7 +462,7 @@ def page(title, root, body, nav=""):
 
 def build_site(state, today, out_dir, cover_dir):
     weeks = {}
-    for a in state["albums"].values():
+    for a in unique(state["albums"].values()):
         if (a.get("released") or "") > today.isoformat():
             continue
         first = dt.date.fromisoformat(a["first_seen"])
