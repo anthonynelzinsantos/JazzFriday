@@ -22,9 +22,13 @@ jobs:
           import json, time
           import jazz_friday as j
 
+          try:
+              print(f"new releases: OK, {len(j.qobuz_curated())} albums")
+          except RuntimeError as e:
+              print(f"new releases: {e}")
+
           albums = list(json.load(open("state.json"))["albums"].values())
-          targets = [("listing", f"{j.QOBUZ}/{j.LOCALE}/shop/jazz/download-streaming-albums"),
-                     ("cover", albums[0]["cover"])]
+          targets = [("cover", albums[0]["cover"])]
           targets += [(f"album page {i + 1}", a["qobuz"]) for i, a in enumerate(albums[:3])]
           for label, url in targets:
               try:

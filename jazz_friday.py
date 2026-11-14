@@ -17,6 +17,8 @@ import urllib.request
 QOBUZ = "https://www.qobuz.com"
 LOCALE = "fr-fr"            # Qobuz store locale
 APPLE_COUNTRY = "fr"        # Apple Music storefront
+MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août",
+          "septembre", "octobre", "novembre", "décembre"]
 WEEKS_ON_HOME = 4           # Weeks on front page
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/129.0 Safari/537.36")
@@ -51,33 +53,48 @@ def text(s):
 
 # ---------------------------------------------------------------- Qobuz
 
-def qobuz_curated():
-    """Albums in the editorial “Les nouveautés Jazz” block of the jazz shop page."""
-    page = fetch(f"{QOBUZ}/{LOCALE}/shop/jazz/download-streaming-albums")
-    start = page.find('id="newAlbum"')
-    if start < 0:
-        raise RuntimeError("Qobuz page layout changed: 'newAlbum' block not found")
-    end = page.find('id="newAlbum"', start + 1)
-    block = page[start:end if end > 0 else start + 200000]
-    stop = block.find("</ul>", block.find('class="filter-items"'))
-    block = block[:stop] if stop > 0 else block
-
+def qobuz_cards(page):
     albums = []
-    for li in re.findall(r'<li class="album-container[^"]*">(.*?)</li>', block, re.S):
-        m = re.search(r'href="(/[^"]*/album/[^"]+/([a-z0-9]+))"', li)
-        t = re.search(r'class="album-title[^"]*"[^>]*>(.*?)</a>', li, re.S)
-        a = re.search(r'class="artist-name[^"]*"[^>]*>(.*?)</a>', li, re.S)
-        c = re.search(r'<img[^>]*\bsrc="(https://static\.qobuz\.com/images/covers/[^"]+)_\d+\.jpg"', li)
-        if not (m and t):
+    for card in re.split(r'(?=<div\s+id="release-card-release-card-list-\d+-grid-\d+-[a-z0-9]+")', page)[1:]:
+        t = re.search(r'<a[^>]*\btitle="[^"]*"[^>]*\bhref="(/[^"]*/album/[^"]+/([a-z0-9]+))"[^>]*>'
+                      r'\s*([^<]+?)\s*</a>', card)
+        if not t:
             continue
-        albums.append({
-            "id": m.group(2),
-            "qobuz": QOBUZ + m.group(1),
-            "title": text(t.group(1)),
+        a = re.search(r'href="/[^"]*/interpreter/[^"]+"[^>]*>\s*([^<]+?)\s*</a>', card)
+        q = re.search(r'aria-label="Audio quality: ([^,"]+)', card)
+        c = re.search(r'<img[^>]*\bsrc="(https://static\.qobuz\.com/images/covers/[^"]+)_\d+\.jpg"', card)
+        album = {
+            "id": t.group(2),
+            "qobuz": QOBUZ + t.group(1),
+            "title": text(t.group(3)),
             "artist": text(a.group(1)) if a else "",
-            "hires": "smr-audio" in li,
+            "hires": bool(q and q.group(1).startswith("Hi-Res")),
             "cover": f"{c.group(1)}_600.jpg" if c else "",
-        })
+        }
+        spans = [text(s) for s in re.findall(r"<span[^>]*>\s*([^<]+?)\s*</span>", card)]
+        for i, s in enumerate(spans):
+            d = re.search(r"(\d{1,2}) (" + "|".join(MONTHS) + r") (\d{4})", s)
+            if d:
+                album["released"] = f"{d.group(3)}-{MONTHS.index(d.group(2)) + 1:02d}-{int(d.group(1)):02d}"
+                if i and spans[i - 1] not in ("Ajouter au panier", "Précommande"):
+                    album["genre"] = spans[i - 1]
+                break
+        albums.append(album)
+    return albums
+
+
+def qobuz_curated():
+    """Albums on the “Nouveautés Jazz” pages of the Qobuz shop."""
+    base = f"{QOBUZ}/{LOCALE}/shop/new-releases/jazz/download-streaming-albums"
+    albums, seen = [], set()
+    for n in range(1, 11):
+        fresh = [a for a in qobuz_cards(fetch(base if n == 1 else f"{base}/page/{n}"))
+                 if a["id"] not in seen]
+        if not fresh:
+            break
+        seen.update(a["id"] for a in fresh)
+        albums += fresh
+        time.sleep(2)
     if not albums:
         raise RuntimeError("Qobuz page layout changed: no albums parsed")
     return albums
@@ -498,6 +515,8 @@ def main():
     new = partial = 0
     for a in qobuz_curated():
         if a["id"] in known:
+            if known[a["id"]].get("partial"):
+                known[a["id"]].update({k: a[k] for k in ("released", "genre") if a.get(k)})
             continue
         if not blocked:
             try:
@@ -511,9 +530,9 @@ def main():
         hit = apple_match(a, a.get("released") or today.isoformat())
         a["apple"] = apple_url(hit)
         if hit and a.get("partial"):
-            if hit.get("releaseDate"):
+            if hit.get("releaseDate") and not a.get("released"):
                 a["released"] = hit["releaseDate"][:10]
-            if hit.get("primaryGenreName"):
+            if hit.get("primaryGenreName") and not a.get("genre"):
                 a["genre"] = hit["primaryGenreName"]
         a["first_seen"] = today.isoformat()
         known[a["id"]] = a

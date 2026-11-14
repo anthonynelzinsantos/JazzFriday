@@ -1283,7 +1283,7 @@
    "partial": true,
    "apple": "https://music.apple.com/fr/album/chroma/6770977034",
    "released": "2026-11-06",
-   "genre": "Jazz",
+   "genre": "Jazz vocal",
    "first_seen": "2026-11-07"
   },
   "dm805vuc89kin": {
@@ -1374,7 +1374,7 @@
    "partial": true,
    "apple": "https://music.apple.com/fr/album/minar-of-dreams-feat-mindaugas-stumbras-fergus/6803603393",
    "released": "2026-11-06",
-   "genre": "Jazz",
+   "genre": "Jazz contemporain",
    "first_seen": "2026-11-07"
   },
   "kuzec56wdja85": {
@@ -1400,7 +1400,7 @@
    "partial": true,
    "apple": "https://music.apple.com/fr/album/the-sound-orchestra/6779359794",
    "released": "2026-11-06",
-   "genre": "Big band",
+   "genre": "Jazz",
    "first_seen": "2026-11-07"
   },
   "wf1rmq0u18rqe": {
@@ -1413,7 +1413,7 @@
    "partial": true,
    "apple": "https://music.apple.com/fr/album/ad-astra/6824415300",
    "released": "2026-11-06",
-   "genre": "Fusion",
+   "genre": "Jazz fusion & Jazz rock",
    "first_seen": "2026-11-07"
   },
   "xks5o7ph96jdp": {
@@ -1425,7 +1425,9 @@
    "cover": "https://static.qobuz.com/images/covers/dp/6j/xks5o7ph96jdp_600.jpg",
    "partial": true,
    "apple": null,
-   "first_seen": "2026-11-07"
+   "first_seen": "2026-11-07",
+   "released": "2026-11-06",
+   "genre": "Jazz"
   },
   "zo38v8zqdrksv": {
    "id": "zo38v8zqdrksv",
@@ -1437,7 +1439,7 @@
    "partial": true,
    "apple": "https://music.apple.com/fr/album/lux-divina/6810689001",
    "released": "2026-11-06",
-   "genre": "Inspiration jazz",
+   "genre": "Musiques du monde",
    "first_seen": "2026-11-07"
   },
   "um2iu9zf8jw29": {
@@ -1463,7 +1465,7 @@
    "partial": true,
    "apple": "https://music.apple.com/fr/album/nefelejcs/6810599361",
    "released": "2026-11-06",
-   "genre": "Jazz grand public",
+   "genre": "Jazz",
    "first_seen": "2026-11-07"
   },
   "urcx59skh5vef": {
@@ -1475,7 +1477,9 @@
    "cover": "https://static.qobuz.com/images/covers/ef/5v/urcx59skh5vef_600.jpg",
    "partial": true,
    "apple": null,
-   "first_seen": "2026-11-07"
+   "first_seen": "2026-11-07",
+   "released": "2026-11-06",
+   "genre": "Jazz"
   },
   "y89rv00pp40so": {
    "id": "y89rv00pp40so",
@@ -1486,7 +1490,9 @@
    "cover": "https://static.qobuz.com/images/covers/so/40/y89rv00pp40so_600.jpg",
    "partial": true,
    "apple": null,
-   "first_seen": "2026-11-07"
+   "first_seen": "2026-11-07",
+   "released": "2026-11-06",
+   "genre": "Acid jazz"
   },
   "k8owe0oasnqit": {
    "id": "k8owe0oasnqit",
@@ -1511,7 +1517,7 @@
    "partial": true,
    "apple": "https://music.apple.com/fr/album/berati/6817713361",
    "released": "2026-11-06",
-   "genre": "Jazz",
+   "genre": "Grèce",
    "first_seen": "2026-11-07"
   },
   "dn4fmp0afc9m7": {
@@ -1550,7 +1556,7 @@
    "partial": true,
    "apple": "https://music.apple.com/fr/album/the-game-changer/6806989245",
    "released": "2026-10-30",
-   "genre": "Jazz",
+   "genre": "Be Bop",
    "first_seen": "2026-11-07"
   },
   "whyk5st7tlm7w": {
@@ -1602,7 +1608,7 @@
    "partial": true,
    "apple": "https://music.apple.com/fr/album/house-of-trane/6805981144",
    "released": "2026-10-30",
-   "genre": "Jazz",
+   "genre": "Be Bop",
    "first_seen": "2026-11-07"
   },
   "m3l371xqwbapl": {
@@ -1617,6 +1623,370 @@
    "released": "2026-10-30",
    "genre": "Jazz",
    "first_seen": "2026-11-07"
+  },
+  "fpoq100peqjph": {
+   "id": "fpoq100peqjph",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/close-to-home-bill-laurance-michael-league/fpoq100peqjph",
+   "title": "Close to Home",
+   "artist": "Bill Laurance",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/ph/qj/fpoq100peqjph_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz contemporain",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/close-to-home/6795964175",
+   "first_seen": "2026-11-14"
+  },
+  "sprliyjqti0ja": {
+   "id": "sprliyjqti0ja",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/ive-known-rivers-and-other-bodies-gary-bartz-ntu-troop/sprliyjqti0ja",
+   "title": "I've Known Rivers And Other Bodies (Remastered 2026 / Live At The Montreux Jazz Festival, Montreux, CHE / July 7, 1973)",
+   "artist": "Gary Bartz NTU Troop",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/ja/i0/sprliyjqti0ja_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/ive-known-rivers-and-other-bodies-remastered-2026/6801277629",
+   "first_seen": "2026-11-14"
+  },
+  "gb7g64sfy8bwv": {
+   "id": "gb7g64sfy8bwv",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/beginningless-anna-butterss-john-raymond-ben-lumsdaine/gb7g64sfy8bwv",
+   "title": "Beginningless",
+   "artist": "Anna Butterss",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/wv/8b/gb7g64sfy8bwv_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/beginningless/6802414507",
+   "first_seen": "2026-11-14"
+  },
+  "v0o616moigb8d": {
+   "id": "v0o616moigb8d",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/evergreen-kalia-vandever-dave-harrington/v0o616moigb8d",
+   "title": "Evergreen",
+   "artist": "Kalia Vandever",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/8d/gb/v0o616moigb8d_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/evergreen/6800473174",
+   "first_seen": "2026-11-14"
+  },
+  "q7kyp0dgf7izw": {
+   "id": "q7kyp0dgf7izw",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/fantasy-reveries-brad-mehldau/q7kyp0dgf7izw",
+   "title": "Fantasy & Reveries",
+   "artist": "Brad Mehldau",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/zw/7i/q7kyp0dgf7izw_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Classique",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/fantasy-reveries/6803109717",
+   "first_seen": "2026-11-14"
+  },
+  "j2ojda5tv2uc8": {
+   "id": "j2ojda5tv2uc8",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/mek-do-mend-wonky-logic/j2ojda5tv2uc8",
+   "title": "Mek Do & Mend",
+   "artist": "Wonky Logic",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/c8/2u/j2ojda5tv2uc8_600.jpg",
+   "released": "2026-11-11",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/mek-do-mend/6798831904",
+   "first_seen": "2026-11-14"
+  },
+  "a1gwz9z6mqxmz": {
+   "id": "a1gwz9z6mqxmz",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/nouveaux-mondes-sophie-alour/a1gwz9z6mqxmz",
+   "title": "Nouveaux Mondes",
+   "artist": "Sophie Alour",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/mz/qx/a1gwz9z6mqxmz_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz contemporain",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/nouveaux-mondes/6799925467",
+   "first_seen": "2026-11-14"
+  },
+  "n7bz1cl3s8hhh": {
+   "id": "n7bz1cl3s8hhh",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/animative-josh-johnson/n7bz1cl3s8hhh",
+   "title": "Animative",
+   "artist": "Josh Johnson",
+   "hires": false,
+   "cover": "https://static.qobuz.com/images/covers/hh/8h/n7bz1cl3s8hhh_600.jpg",
+   "released": "2026-10-23",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/animative/6795584360",
+   "first_seen": "2026-11-14"
+  },
+  "uzeegjmgzp1iv": {
+   "id": "uzeegjmgzp1iv",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/hurry-red-telephone-marc-ribot/uzeegjmgzp1iv",
+   "title": "Hurry Red Telephone",
+   "artist": "Marc Ribot",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/iv/p1/uzeegjmgzp1iv_600.jpg",
+   "released": "2026-10-30",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/hurry-red-telephone/6813581923",
+   "first_seen": "2026-11-14"
+  },
+  "tozeb5mg6m0xw": {
+   "id": "tozeb5mg6m0xw",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/somewhere-soul-rituals-vol-02-somewhere-soul/tozeb5mg6m0xw",
+   "title": "Somewhere Soul Rituals, Vol. 02",
+   "artist": "Somewhere Soul",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/xw/m0/tozeb5mg6m0xw_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz contemporain",
+   "partial": true,
+   "apple": null,
+   "first_seen": "2026-11-14"
+  },
+  "lv7rhykb27juo": {
+   "id": "lv7rhykb27juo",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/veves-electriques-kham-meslien/lv7rhykb27juo",
+   "title": "Vévés Électriques",
+   "artist": "Kham Meslien",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/uo/7j/lv7rhykb27juo_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz contemporain",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/v%C3%A9v%C3%A9s-%C3%A9lectriques/6793503417",
+   "first_seen": "2026-11-14"
+  },
+  "ohhnqgq4fvb8n": {
+   "id": "ohhnqgq4fvb8n",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/amalthea-sylvie-courvoisier/ohhnqgq4fvb8n",
+   "title": "Amalthea",
+   "artist": "Sylvie Courvoisier",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/8n/vb/ohhnqgq4fvb8n_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/amalthea/6781061879",
+   "first_seen": "2026-11-14"
+  },
+  "qil84mx0rety5": {
+   "id": "qil84mx0rety5",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/guerres-diego-imbert/qil84mx0rety5",
+   "title": "Guerres",
+   "artist": "Diego Imbert",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/y5/et/qil84mx0rety5_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz contemporain",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/guerres-feat-david-el-malek-quentin-ghomari-franck/6815186717",
+   "first_seen": "2026-11-14"
+  },
+  "iyaiw6plxtzl6": {
+   "id": "iyaiw6plxtzl6",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/relish-reimagined-joan-osborne/iyaiw6plxtzl6",
+   "title": "Relish Reimagined",
+   "artist": "Joan Osborne",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/l6/tz/iyaiw6plxtzl6_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/relish-reimagined/6810700207",
+   "first_seen": "2026-11-14"
+  },
+  "h14mhhi053fai": {
+   "id": "h14mhhi053fai",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/flamingo-laurent-coulondre-mathias-levy-jeremy-bruyere-matthieu-chazarenc/h14mhhi053fai",
+   "title": "Flamingo",
+   "artist": "Laurent Coulondre",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/ai/3f/h14mhhi053fai_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz contemporain",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/flamingo/6810323181",
+   "first_seen": "2026-11-14"
+  },
+  "a8punrh5u8qfo": {
+   "id": "a8punrh5u8qfo",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/the-savoy-recordings-john-coltrane-wilbur-harden/a8punrh5u8qfo",
+   "title": "The Savoy Recordings (Remastered 2026)",
+   "artist": "John Coltrane",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/fo/8q/a8punrh5u8qfo_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/the-savoy-recordings-remastered-2026/6810358806",
+   "first_seen": "2026-11-14"
+  },
+  "re3zooyso4n5s": {
+   "id": "re3zooyso4n5s",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/one-night-in-highland-park-louis-armstrong/re3zooyso4n5s",
+   "title": "One Night In Highland Park (Live)",
+   "artist": "Louis Armstrong",
+   "hires": false,
+   "cover": "https://static.qobuz.com/images/covers/5s/4n/re3zooyso4n5s_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/one-night-in-highland-park-live/6814586519",
+   "first_seen": "2026-11-14"
+  },
+  "blpdp8mn5rfb7": {
+   "id": "blpdp8mn5rfb7",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/somethings-coming-laura-anglade/blpdp8mn5rfb7",
+   "title": "Something's Coming",
+   "artist": "Laura Anglade",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/b7/rf/blpdp8mn5rfb7_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz vocal",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/somethings-coming/6783523854",
+   "first_seen": "2026-11-14"
+  },
+  "m41s5979bu042": {
+   "id": "m41s5979bu042",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/grim-trigger-anemoia/m41s5979bu042",
+   "title": "Grim Trigger",
+   "artist": "Anemoia",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/42/u0/m41s5979bu042_600.jpg",
+   "released": "2026-11-20",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/grim-trigger/6786889874",
+   "first_seen": "2026-11-14"
+  },
+  "d11xi8i7yemi1": {
+   "id": "d11xi8i7yemi1",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/traces-in-the-sand-stephan-micus/d11xi8i7yemi1",
+   "title": "Traces in the Sand",
+   "artist": "Stephan Micus",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/i1/em/d11xi8i7yemi1_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/traces-in-the-sand/6817313207",
+   "first_seen": "2026-11-14"
+  },
+  "rd1u5dy2pobrf": {
+   "id": "rd1u5dy2pobrf",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/jazzed-eva-cassidy/rd1u5dy2pobrf",
+   "title": "JAZZED",
+   "artist": "Eva Cassidy",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/rf/ob/rd1u5dy2pobrf_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/jazzed/6794743079",
+   "first_seen": "2026-11-14"
+  },
+  "lpevtdai5nllz": {
+   "id": "lpevtdai5nllz",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/confirmation-jultrane/lpevtdai5nllz",
+   "title": "Confirmation",
+   "artist": "Jultrane",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/lz/nl/lpevtdai5nllz_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz contemporain",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/confirmation/6820476422",
+   "first_seen": "2026-11-14"
+  },
+  "ocdo9l9u3arq6": {
+   "id": "ocdo9l9u3arq6",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/a-lamour-et-au-diable-leila-duclos/ocdo9l9u3arq6",
+   "title": "A l'Amour et au Diable",
+   "artist": "Leïla Duclos",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/q6/ar/ocdo9l9u3arq6_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": null,
+   "first_seen": "2026-11-14"
+  },
+  "ciieexjp04bgq": {
+   "id": "ciieexjp04bgq",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/immersion-margot-rivaille-fragrance/ciieexjp04bgq",
+   "title": "Immersion",
+   "artist": "Margot Rivaille",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/gq/4b/ciieexjp04bgq_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz contemporain",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/immersion/6813523312",
+   "first_seen": "2026-11-14"
+  },
+  "agyqsd8lmhb2c": {
+   "id": "agyqsd8lmhb2c",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/the-remembering-roman-norfleet-be-present-art-group/agyqsd8lmhb2c",
+   "title": "The Remembering",
+   "artist": "Roman Norfleet",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/2c/hb/agyqsd8lmhb2c_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/the-remembering/6802358009",
+   "first_seen": "2026-11-14"
+  },
+  "thy7sbd3kuibe": {
+   "id": "thy7sbd3kuibe",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/heart-space-sam-crowe/thy7sbd3kuibe",
+   "title": "Heart/Space",
+   "artist": "Sam Crowe",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/be/ui/thy7sbd3kuibe_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz fusion & Jazz rock",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/heart-space/6826283696",
+   "first_seen": "2026-11-14"
+  },
+  "f9ta25he4ikj9": {
+   "id": "f9ta25he4ikj9",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/high-on-the-western-hill-silver-birch/f9ta25he4ikj9",
+   "title": "High on the Western Hill",
+   "artist": "Silver Birch",
+   "hires": true,
+   "cover": "https://static.qobuz.com/images/covers/j9/ik/f9ta25he4ikj9_600.jpg",
+   "released": "2026-11-13",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/high-on-the-western-hill/6808390135",
+   "first_seen": "2026-11-14"
+  },
+  "h7dqs4gzno1rq": {
+   "id": "h7dqs4gzno1rq",
+   "qobuz": "https://www.qobuz.com/fr-fr/album/historie-ludowe-ostaniec/h7dqs4gzno1rq",
+   "title": "Historie Ludowe",
+   "artist": "Ostaniec",
+   "hires": false,
+   "cover": "https://static.qobuz.com/images/covers/rq/o1/h7dqs4gzno1rq_600.jpg",
+   "released": "2026-10-27",
+   "genre": "Jazz",
+   "partial": true,
+   "apple": "https://music.apple.com/fr/album/historie-ludowe/6821884689",
+   "first_seen": "2026-11-14"
   }
  }
 }
