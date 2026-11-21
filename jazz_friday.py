@@ -18,6 +18,7 @@ QOBUZ = "https://www.qobuz.com"
 LOCALE = "fr-fr"            # Qobuz store locale
 APPLE_COUNTRY = "fr"        # Apple Music storefront
 STORES = ["fr-fr", "gb-en"]
+PAGES = 3
 MONTHS = {
     "fr-fr": ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août",
               "septembre", "octobre", "novembre", "décembre"],
@@ -89,14 +90,14 @@ def qobuz_cards(page, store=LOCALE):
     return albums
 
 
-def qobuz_curated():
+def qobuz_curated(pages=PAGES):
     """Albums on the “Nouveautés Jazz” pages of the Qobuz shop."""
     albums, seen = [], set()
     for store in STORES:
         base = f"{QOBUZ}/{store}/shop/new-releases/jazz/download-streaming-albums"
         found = 0
         try:
-            for n in range(1, 11):
+            for n in range(1, pages + 1):
                 fresh = [a for a in qobuz_cards(fetch(base if n == 1 else f"{base}/page/{n}"), store)
                          if a["id"] not in seen]
                 if not fresh:
@@ -516,6 +517,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out-dir", required=True, help="Web root to write the pages into")
     ap.add_argument("--state", required=True, help="JSON file that remembers every album")
+    ap.add_argument("--pages", type=int, default=PAGES, help="Pages to read from each store listing")
     args = ap.parse_args()
 
     today = dt.date.today()
@@ -540,7 +542,7 @@ def main():
             time.sleep(3)
 
     new = partial = 0
-    for a in qobuz_curated():
+    for a in qobuz_curated(args.pages):
         if a["id"] in known:
             if known[a["id"]].get("partial"):
                 known[a["id"]].update({k: a[k] for k in ("released", "genre") if a.get(k)})
